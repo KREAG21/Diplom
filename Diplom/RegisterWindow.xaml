@@ -1,0 +1,115 @@
+﻿<Window x:Class="Diplom.RegisterWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Diplom"
+        mc:Ignorable="d"
+        Title="Цирюльникъ | Регистрация" 
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="CanResize"
+        WindowState="Maximized"
+        Background="#FFFAF5EE">
+
+    <Window.Resources>
+        <FontFamily x:Key="ImperialFont">Palatino Linotype</FontFamily>
+        <SolidColorBrush x:Key="ImperialGold" Color="#FFD4AF37"/>
+        <SolidColorBrush x:Key="ImperialRed" Color="#FF8B0000"/>
+        <SolidColorBrush x:Key="Ivory" Color="#FFFAF5EE"/>
+        <SolidColorBrush x:Key="DarkWood" Color="#FF5D2906"/>
+
+        <Style TargetType="Label">
+            <Setter Property="Foreground" Value="{StaticResource ImperialRed}"/>
+            <Setter Property="FontWeight" Value="Medium"/>
+            <Setter Property="FontFamily" Value="{StaticResource ImperialFont}"/>
+            <Setter Property="Padding" Value="0,0,0,5"/>
+            <Setter Property="FontSize" Value="14"/>
+        </Style>
+
+        <Style TargetType="TextBox">
+            <Setter Property="Background" Value="{StaticResource Ivory}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource ImperialGold}"/>
+            <Setter Property="BorderThickness" Value="1.5"/>
+            <Setter Property="Padding" Value="10,8"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Foreground" Value="{StaticResource DarkWood}"/>
+            <Setter Property="FontFamily" Value="{StaticResource ImperialFont}"/>
+            <Setter Property="CaretBrush" Value="{StaticResource ImperialRed}"/>
+        </Style>
+
+        <Style TargetType="PasswordBox">
+            <Setter Property="Background" Value="{StaticResource Ivory}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource ImperialGold}"/>
+            <Setter Property="BorderThickness" Value="1.5"/>
+            <Setter Property="Padding" Value="10,8"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Foreground" Value="{StaticResource DarkWood}"/>
+            <Setter Property="FontFamily" Value="{StaticResource ImperialFont}"/>
+        </Style>
+
+        <Style TargetType="Button">
+            <Setter Property="Background" Value="{StaticResource ImperialRed}"/>
+            <Setter Property="Foreground" Value="{StaticResource ImperialGold}"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="15,8"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="FontSize" Value="15"/>
+            <Setter Property="FontFamily" Value="{StaticResource ImperialFont}"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Margin" Value="0,10,0,0"/>
+            <Setter Property="Height" Value="40"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#FFA52A2A"/>
+                    <Setter Property="Foreground" Value="#FFE6C060"/>
+                </Trigger>
+                <Trigger Property="IsPressed" Value="True">
+                    <Setter Property="Background" Value="#FF800000"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+
+    <Grid Margin="40">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Заголовок -->
+        <Border BorderBrush="{StaticResource ImperialGold}" 
+                BorderThickness="0,0,0,2" 
+                Padding="0,0,0,10" 
+                Margin="0,0,0,30"
+                Grid.Row="0">
+            <TextBlock Text="РЕГИСТРАЦИЯ СОТРУДНИКА" 
+                       FontSize="24" 
+                       FontWeight="Bold" 
+                       Foreground="{StaticResource ImperialRed}" 
+                       HorizontalAlignment="Center"
+                       FontFamily="{StaticResource ImperialFont}"/>
+        </Border>
+
+        <!-- Форма регистрации, центрируемая -->
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+            <StackPanel Width="400" HorizontalAlignment="Center">
+                <Label Content="Имя сотрудника:"/>
+                <TextBox x:Name="RegUsernameBox" Margin="0,5,0,15"/>
+
+                <Label Content="Почта:"/>
+                <TextBox x:Name="EmailBox" Margin="0,5,0,15"/>
+
+                <Label Content="Должность:"/>
+                <TextBox x:Name="RoleBox" Margin="0,5,0,15"/>
+
+                <Label Content="Пароль:"/>
+                <PasswordBox x:Name="RegPasswordBox" Margin="0,5,0,15"/>
+
+                <Label Content="Повторите пароль:"/>
+                <PasswordBox x:Name="ConfirmPasswordBox" Margin="0,5,0,20"/>
+
+                <Button Content="ЗАРЕГИСТРИРОВАТЬСЯ" Click="RegisterButton_Click"/>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</Window>

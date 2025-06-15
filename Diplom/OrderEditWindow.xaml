@@ -1,0 +1,157 @@
+﻿<Window x:Class="Diplom.OrderEditWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Diplom"
+        mc:Ignorable="d"
+        Title="{Binding WindowTitle}" 
+        Width="500" Height="462"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="NoResize"
+        Background="#FFFAF5EE">
+
+    <Window.Resources>
+        <FontFamily x:Key="ImperialFont">Palatino Linotype</FontFamily>
+        <SolidColorBrush x:Key="ImperialGold" Color="#FFD4AF37"/>
+        <SolidColorBrush x:Key="ImperialRed" Color="#FF8B0000"/>
+        <SolidColorBrush x:Key="Ivory" Color="#FFFAF5EE"/>
+        <SolidColorBrush x:Key="DarkWood" Color="#FF5D2906"/>
+
+        <Style TargetType="Label">
+            <Setter Property="Foreground" Value="{StaticResource ImperialRed}"/>
+            <Setter Property="FontWeight" Value="Medium"/>
+            <Setter Property="FontFamily" Value="{StaticResource ImperialFont}"/>
+            <Setter Property="Padding" Value="0,0,0,5"/>
+            <Setter Property="FontSize" Value="14"/>
+        </Style>
+
+        <Style TargetType="TextBox">
+            <Setter Property="Background" Value="{StaticResource Ivory}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource ImperialGold}"/>
+            <Setter Property="BorderThickness" Value="1.5"/>
+            <Setter Property="Padding" Value="10,8"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Foreground" Value="{StaticResource DarkWood}"/>
+            <Setter Property="FontFamily" Value="{StaticResource ImperialFont}"/>
+            <Setter Property="CaretBrush" Value="{StaticResource ImperialRed}"/>
+        </Style>
+
+        <Style TargetType="ComboBox">
+            <Setter Property="Background" Value="{StaticResource Ivory}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource ImperialGold}"/>
+            <Setter Property="BorderThickness" Value="1.5"/>
+            <Setter Property="Padding" Value="10,6"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Foreground" Value="{StaticResource DarkWood}"/>
+            <Setter Property="FontFamily" Value="{StaticResource ImperialFont}"/>
+        </Style>
+
+        <Style TargetType="DatePicker">
+            <Setter Property="Background" Value="{StaticResource Ivory}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource ImperialGold}"/>
+            <Setter Property="BorderThickness" Value="1.5"/>
+            <Setter Property="Padding" Value="10,6"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Foreground" Value="{StaticResource DarkWood}"/>
+            <Setter Property="FontFamily" Value="{StaticResource ImperialFont}"/>
+        </Style>
+
+        <Style TargetType="Button">
+            <Setter Property="Background" Value="{StaticResource ImperialRed}"/>
+            <Setter Property="Foreground" Value="{StaticResource ImperialGold}"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="15,8"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontFamily" Value="{StaticResource ImperialFont}"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Margin" Value="10,0,0,0"/>
+            <Setter Property="Width" Value="120"/>
+            <Setter Property="Height" Value="35"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#FFA52A2A"/>
+                    <Setter Property="Foreground" Value="#FFE6C060"/>
+                </Trigger>
+                <Trigger Property="IsPressed" Value="True">
+                    <Setter Property="Background" Value="#FF800000"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Заголовок -->
+        <Border BorderBrush="{StaticResource ImperialGold}" 
+                BorderThickness="0,0,0,2"
+                Margin="0,0,0,15"
+                Padding="0,0,0,10">
+            <TextBlock Text="{Binding WindowTitle}" 
+                       FontSize="18" 
+                       FontWeight="Bold"
+                       Foreground="{StaticResource ImperialRed}"
+                       HorizontalAlignment="Center"
+                       FontFamily="{StaticResource ImperialFont}"/>
+        </Border>
+
+        <!-- Основные поля -->
+        <Grid Margin="0,51,0,13" Grid.RowSpan="2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Клиент -->
+            <Label Content="Господин/госпожа:" Grid.Row="0" Grid.Column="0"/>
+            <TextBox Grid.Row="0" Grid.Column="1"
+                     Text="{Binding CustomerName, UpdateSourceTrigger=PropertyChanged}"
+                     Margin="0,0,0,15"/>
+
+            <!-- Услуга -->
+            <Label Content="Услуга:" Grid.Row="1" Grid.Column="0"/>
+            <TextBox Grid.Row="1" Grid.Column="1"
+                     Text="{Binding ServiceDescription, UpdateSourceTrigger=PropertyChanged}"
+                     Margin="0,0,0,15" 
+                     TextWrapping="Wrap" 
+                     AcceptsReturn="True"
+                     Height="60"/>
+
+            <!-- Дата -->
+            <Label Content="Дата:" Grid.Row="2" Grid.Column="0"/>
+            <DatePicker Grid.Row="2" Grid.Column="1"
+                        SelectedDate="{Binding OrderDate}"
+                        Margin="0,0,0,15"/>
+
+            <!-- Сумма -->
+            <Label Content="Сумма (.руб):" Grid.Row="3" Grid.Column="0"/>
+            <TextBox Grid.Row="3" Grid.Column="1"
+                     Text="{Binding TotalAmount, UpdateSourceTrigger=PropertyChanged}"
+                     Margin="0,0,0,15"/>
+
+            <!-- Оборудование -->
+        </Grid>
+
+        <!-- Кнопки -->
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button Content="СОХРАНИТЬ" 
+                    Command="{Binding SaveCommand}"
+                    IsEnabled="{Binding IsFormValid}" Width="132"/>
+            
+        </StackPanel>
+    </Grid>
+</Window>
