@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
         Title="Цирюльникъ | Инвентарь"
-        Width="1364" Height="600"
+        Width="1540" Height="695"
         WindowStartupLocation="CenterScreen"
         Background="#FFFAF5EE" WindowState="Maximized">
 
@@ -99,7 +99,7 @@
 
                     <Button Content="Выгрузить в Excel" Command="{Binding ExportToExcelCommand}"/>
                     <Button Content="Сформировать PDF" Command="{Binding ExportToPdfCommand}"/>
-                    
+
                     <Separator Margin="50,0" Width="20" Visibility="Hidden"/>
 
                     <Button Content="Вернуться" Click="Button_Click"/>

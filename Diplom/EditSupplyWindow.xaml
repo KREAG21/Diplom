@@ -1,0 +1,109 @@
+﻿<Window x:Class="Diplom.EditSupplyWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Цирюльникъ | Редактирование поставки"
+        Height="450" Width="420"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="NoResize"
+        Background="#FFFAF5EE">
+
+    <Window.Resources>
+        <FontFamily x:Key="ImperialFont">Palatino Linotype</FontFamily>
+
+        <SolidColorBrush x:Key="ImperialGold" Color="#FFD4AF37"/>
+        <SolidColorBrush x:Key="ImperialRed" Color="#FF8B0000"/>
+        <SolidColorBrush x:Key="Ivory" Color="#FFFAF5EE"/>
+        <SolidColorBrush x:Key="DarkWood" Color="#FF5D2906"/>
+
+        <Style TargetType="Label">
+            <Setter Property="Foreground" Value="{StaticResource ImperialRed}"/>
+            <Setter Property="FontWeight" Value="Medium"/>
+            <Setter Property="FontFamily" Value="{StaticResource ImperialFont}"/>
+            <Setter Property="FontSize" Value="15"/>
+        </Style>
+
+        <Style TargetType="TextBox">
+            <Setter Property="Background" Value="{StaticResource Ivory}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource ImperialGold}"/>
+            <Setter Property="BorderThickness" Value="1.5"/>
+            <Setter Property="Padding" Value="10,8"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Foreground" Value="{StaticResource DarkWood}"/>
+            <Setter Property="FontFamily" Value="{StaticResource ImperialFont}"/>
+            <Setter Property="CaretBrush" Value="{StaticResource ImperialRed}"/>
+        </Style>
+
+        <Style TargetType="DatePicker">
+            <Setter Property="FontFamily" Value="{StaticResource ImperialFont}"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Foreground" Value="{StaticResource DarkWood}"/>
+            <Setter Property="Padding" Value="6"/>
+            <Setter Property="BorderBrush" Value="{StaticResource ImperialGold}"/>
+            <Setter Property="BorderThickness" Value="1.5"/>
+            <Setter Property="Background" Value="{StaticResource Ivory}"/>
+        </Style>
+
+        <Style TargetType="Button">
+            <Setter Property="Background" Value="{StaticResource ImperialRed}"/>
+            <Setter Property="Foreground" Value="{StaticResource ImperialGold}"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="12,6"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontFamily" Value="{StaticResource ImperialFont}"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Margin" Value="5"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#FFA52A2A"/>
+                    <Setter Property="Foreground" Value="#FFE6C060"/>
+                </Trigger>
+                <Trigger Property="IsPressed" Value="True">
+                    <Setter Property="Background" Value="#FF800000"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style TargetType="TextBlock">
+            <Setter Property="Foreground" Value="{StaticResource DarkWood}"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontFamily" Value="{StaticResource ImperialFont}"/>
+            <Setter Property="Margin" Value="0,5,0,3"/>
+        </Style>
+    </Window.Resources>
+
+    <Grid Margin="30">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock Text="Редактирование поставки"
+                   FontSize="20"
+                   FontWeight="Bold"
+                   Foreground="{StaticResource ImperialRed}"
+                   HorizontalAlignment="Center"
+                   Margin="0,0,0,20"
+                   FontFamily="{StaticResource ImperialFont}" />
+
+        <StackPanel Grid.Row="1" VerticalAlignment="Top">
+
+            <Label Content="Поставщик:"/>
+            <TextBox x:Name="SupplierBox"/>
+
+            <Label Content="Дата поставки:"/>
+            <DatePicker x:Name="DatePicker"/>
+
+            <Label Content="Стоимость:"/>
+            <TextBox x:Name="CostBox"/>
+
+            <Label Content="ID материала:"/>
+            <TextBox x:Name="MaterialIDBox"/>
+
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,20,0,0">
+                <Button Content="Сохранить" Click="SaveButton_Click"/>
+                <Button Content="Отмена" Click="CancelButton_Click"/>
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</Window>

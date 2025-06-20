@@ -15,7 +15,7 @@ namespace Diplom
         private int _userId;
         private const string ConnectionString = "Server=(local);Database=BeautySalon;Integrated Security=True;";
 
-        public EmployeeWindow(int userId)
+        public EmployeeWindow(int userId, string username)
         {
             _userId = userId;
             InitializeComponent();
@@ -25,6 +25,11 @@ namespace Diplom
 
         public EmployeeWindow()
         {
+        }
+
+        public EmployeeWindow(int userId)
+        {
+            _userId = userId;
         }
 
         private void LoadOrders()

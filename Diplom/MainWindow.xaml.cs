@@ -27,22 +27,35 @@ namespace Diplom
         }
         private void LoginButton_Click(object sender, RoutedEventArgs e)
         {
-            var (success, userId, password) = DatabaseHelper.AuthenticateUser(
-                UsernameBox.Text,
-                PasswordBox.Password
-            );
+            string username = UsernameBox.Text.Trim();
+            string password = PasswordBox.Password;
 
-            if (success)
+            var (success, userId, role) = DatabaseHelper.AuthenticateUser(username, password);
+
+            if (!success)
             {
-                EmployeeWindow employeeWindow = new EmployeeWindow(userId);
-                employeeWindow.Show();
-                Hide();
+                MessageBox.Show("Неверное имя пользователя или пароль.", "Ошибка авторизации", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
             }
-            else
+
+            switch (role.ToLower())
             {
-                MessageBox.Show("Неверное имя пользователя или пароль");
+                case "менеджер":
+                    ManagerWindow managerWindow = new ManagerWindow(userId, username);
+                    managerWindow.Show();
+                    break;
+                case "сотрудник":
+                    EmployeeWindow employeeWindow = new EmployeeWindow(userId, username);
+                    employeeWindow.Show();
+                    break;
+                default:
+                    MessageBox.Show("Роль не распознана.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
             }
+
+            this.Close();
         }
+
         // Остальные методы без изменений
         private void ShowLogin_Click(object sender, RoutedEventArgs e) { /* ... */ }
         private void ShowRegister_Click(object sender, RoutedEventArgs e)

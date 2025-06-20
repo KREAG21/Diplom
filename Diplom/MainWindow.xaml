@@ -90,6 +90,7 @@
             <Setter Property="FontWeight" Value="SemiBold"/>
         </Style>
     </Window.Resources>
+    
 
     <Grid>
         <Grid.RowDefinitions>
@@ -102,7 +103,7 @@
         <!-- Заголовок -->
         <Border Grid.Row="0" BorderBrush="{StaticResource ImperialGold}" 
             BorderThickness="0,0,0,2" Padding="0,0,0,10" Margin="50">
-            <TextBlock Text="ИМПЕРАТОРСКИЙ САЛОНЪ" 
+            <TextBlock Text="ЦИРЮЛЬНИКЪ" 
                    FontSize="36" 
                    FontWeight="Bold" 
                    Foreground="{StaticResource ImperialRed}" 

@@ -1,4 +1,5 @@
-﻿using Diplom.Model;
+﻿using Diplom.Helpers;
+using Diplom.Model;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -160,5 +161,83 @@ namespace Diplom
                 cmd.ExecuteNonQuery();
             }
         }
+
+        public static List<SupplyModel> GetSupplies()
+        {
+            var supplies = new List<SupplyModel>();
+
+            using (var conn = new SqlConnection(connectionString))
+            {
+                conn.Open();
+                string query = @"SELECT s.SupplyID, s.SupplierName, s.DeliveryDate, s.TotalCost, 
+                                s.MaterialID, m.Name AS MaterialName
+                         FROM Supplies s
+                         JOIN Materials m ON s.MaterialID = m.MaterialID";
+
+                using (var cmd = new SqlCommand(query, conn))
+                using (var reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        supplies.Add(new SupplyModel
+                        {
+                            SupplyID = (int)reader["SupplyID"],
+                            SupplierName = reader["SupplierName"].ToString(),
+                            DeliveryDate = (DateTime)reader["DeliveryDate"],
+                            TotalCost = (decimal)reader["TotalCost"],
+                            MaterialID = (int)reader["MaterialID"],
+                            MaterialName = reader["MaterialName"].ToString()
+                        });
+                    }
+                }
+            }
+
+            return supplies;
+        }
+
+        public static bool InsertSupply(string supplierName, DateTime deliveryDate, decimal totalCost, int materialId)
+        {
+            using (var conn = new SqlConnection(connectionString))
+            {
+                conn.Open();
+                var cmd = new SqlCommand("INSERT INTO Supplies (SupplierName, DeliveryDate, TotalCost, MaterialID) VALUES (@name, @date, @cost, @material)", conn);
+                cmd.Parameters.AddWithValue("@name", supplierName);
+                cmd.Parameters.AddWithValue("@date", deliveryDate);
+                cmd.Parameters.AddWithValue("@cost", totalCost);
+                cmd.Parameters.AddWithValue("@material", materialId);
+                int result = cmd.ExecuteNonQuery();
+                return result == 1;
+            }
+        }
+
+        public static bool UpdateSupply(SupplyModel supply)
+        {
+            using (var conn = new SqlConnection(connectionString))
+            {
+                conn.Open();
+                var cmd = new SqlCommand(@"UPDATE Supplies 
+                                   SET SupplierName = @name, DeliveryDate = @date, 
+                                       TotalCost = @cost, MaterialID = @material 
+                                   WHERE SupplyID = @id", conn);
+                cmd.Parameters.AddWithValue("@name", supply.SupplierName);
+                cmd.Parameters.AddWithValue("@date", supply.DeliveryDate);
+                cmd.Parameters.AddWithValue("@cost", supply.TotalCost);
+                cmd.Parameters.AddWithValue("@material", supply.MaterialID);
+                cmd.Parameters.AddWithValue("@id", supply.SupplyID);
+                return cmd.ExecuteNonQuery() == 1;
+            }
+        }
+
+        public static bool DeleteSupply(int supplyId)
+        {
+            using (var conn = new SqlConnection(connectionString))
+            {
+                conn.Open();
+                var cmd = new SqlCommand("DELETE FROM Supplies WHERE SupplyID = @id", conn);
+                cmd.Parameters.AddWithValue("@id", supplyId);
+                return cmd.ExecuteNonQuery() == 1;
+            }
+        }
+
     }
 }
