@@ -13,11 +13,14 @@ namespace Diplom
     public partial class EmployeeWindow : Window
     {
         private int _userId;
+        
+        
         private const string ConnectionString = "Server=(local);Database=BeautySalon;Integrated Security=True;";
 
-        public EmployeeWindow(int userId, string username)
+        public EmployeeWindow(int userId)
         {
             _userId = userId;
+            
             InitializeComponent();
             Title = $"Панель сотрудника (ID: {userId})";
             LoadOrders();
@@ -27,10 +30,7 @@ namespace Diplom
         {
         }
 
-        public EmployeeWindow(int userId)
-        {
-            _userId = userId;
-        }
+       
 
         private void LoadOrders()
         {

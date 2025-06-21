@@ -28,7 +28,7 @@ namespace Diplom
             InitializeComponent();
             this.userId = userId;
             this.username = username;
-
+            LoadMaterials();
             this.Title += $" — {username}";
             LoadSupplies();
         }
@@ -47,6 +47,12 @@ namespace Diplom
                 MessageBox.Show("Ошибка при загрузке поставок:\n" + ex.Message);
             }
         }
+
+        private void LoadMaterials()
+        {
+            MaterialsDataGrid.ItemsSource = DatabaseHelper.GetMaterials();
+        }
+
 
         private void AddSupply_Click(object sender, RoutedEventArgs e)
         {
@@ -95,5 +101,49 @@ namespace Diplom
             }
         }
 
+        private void AddMaterial_Click(object sender, RoutedEventArgs e)
+        {
+            var addWindow = new AddMaterialWindow();
+            if (addWindow.ShowDialog() == true)
+            {
+                LoadMaterials();
+            }
+        }
+
+        private void EditMaterial_Click(object sender, RoutedEventArgs e)
+        {
+            if (MaterialsDataGrid.SelectedItem is MaterialModel selected)
+            {
+                var editWindow = new EditMaterialWindow(selected);
+                if (editWindow.ShowDialog() == true)
+                {
+                    LoadMaterials();
+                }
+            }
+            else
+            {
+                MessageBox.Show("Выберите материал для редактирования.");
+            }
+        }
+
+
+        private void DeleteMaterial_Click(object sender, RoutedEventArgs e)
+        {
+            if (MaterialsDataGrid.SelectedItem is MaterialModel selected)
+            {
+                var result = MessageBox.Show($"Удалить материал «{selected.Name}»?", "Подтверждение", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+                if (result == MessageBoxResult.Yes)
+                {
+                    if (DatabaseHelper.DeleteMaterial(selected.MaterialID))
+                        LoadMaterials();
+                    else
+                        MessageBox.Show("Не удалось удалить материал.");
+                }
+            }
+            else
+            {
+                MessageBox.Show("Выберите материал для удаления.");
+            }
+        }
     }
 }

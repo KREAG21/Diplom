@@ -13,8 +13,6 @@ namespace Diplom.Helpers
         public DateTime DeliveryDate { get; set; }
         public decimal TotalCost { get; set; }
         public int MaterialID { get; set; }
-
-        // Необязательно: для отображения
-        public string MaterialName { get; set; }
     }
+
 }

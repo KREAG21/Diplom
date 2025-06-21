@@ -22,6 +22,7 @@ namespace Diplom
     {
 
         private int _userId;
+        
         public EquipmentWindow(int userId)
         {
             _userId = userId;

@@ -45,7 +45,7 @@ namespace Diplom
                     managerWindow.Show();
                     break;
                 case "сотрудник":
-                    EmployeeWindow employeeWindow = new EmployeeWindow(userId, username);
+                    EmployeeWindow employeeWindow = new EmployeeWindow(userId);
                     employeeWindow.Show();
                     break;
                 default:

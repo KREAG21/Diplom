@@ -164,36 +164,29 @@ namespace Diplom
 
         public static List<SupplyModel> GetSupplies()
         {
-            var supplies = new List<SupplyModel>();
-
+            var list = new List<SupplyModel>();
             using (var conn = new SqlConnection(connectionString))
             {
                 conn.Open();
-                string query = @"SELECT s.SupplyID, s.SupplierName, s.DeliveryDate, s.TotalCost, 
-                                s.MaterialID, m.Name AS MaterialName
-                         FROM Supplies s
-                         JOIN Materials m ON s.MaterialID = m.MaterialID";
-
-                using (var cmd = new SqlCommand(query, conn))
+                var cmd = new SqlCommand("SELECT SupplyID, SupplierName, DeliveryDate, TotalCost, MaterialID FROM Supplies", conn);
                 using (var reader = cmd.ExecuteReader())
                 {
                     while (reader.Read())
                     {
-                        supplies.Add(new SupplyModel
+                        list.Add(new SupplyModel
                         {
                             SupplyID = (int)reader["SupplyID"],
                             SupplierName = reader["SupplierName"].ToString(),
                             DeliveryDate = (DateTime)reader["DeliveryDate"],
                             TotalCost = (decimal)reader["TotalCost"],
-                            MaterialID = (int)reader["MaterialID"],
-                            MaterialName = reader["MaterialName"].ToString()
+                            MaterialID = (int)reader["MaterialID"]
                         });
                     }
                 }
             }
-
-            return supplies;
+            return list;
         }
+
 
         public static bool InsertSupply(string supplierName, DateTime deliveryDate, decimal totalCost, int materialId)
         {
@@ -238,6 +231,69 @@ namespace Diplom
                 return cmd.ExecuteNonQuery() == 1;
             }
         }
+
+        public static List<MaterialModel> GetMaterials()
+        {
+            var list = new List<MaterialModel>();
+            using (var conn = new SqlConnection(connectionString))
+            {
+                conn.Open();
+                var cmd = new SqlCommand("SELECT MaterialID, Name, Quantity, UnitPrice FROM Materials", conn);
+                using (var reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        list.Add(new MaterialModel
+                        {
+                            MaterialID = (int)reader["MaterialID"],
+                            Name = reader["Name"].ToString(),
+                            Quantity = (int)reader["Quantity"],
+                            UnitPrice = (decimal)reader["UnitPrice"]
+                        });
+                    }
+                }
+            }
+            return list;
+        }
+
+        public static bool DeleteMaterial(int materialId)
+        {
+            using (var conn = new SqlConnection(connectionString))
+            {
+                conn.Open();
+                var cmd = new SqlCommand("DELETE FROM Materials WHERE MaterialID = @id", conn);
+                cmd.Parameters.AddWithValue("@id", materialId);
+                return cmd.ExecuteNonQuery() == 1;
+            }
+        }
+
+        public static bool AddMaterial(MaterialModel material)
+        {
+            using (var conn = new SqlConnection(connectionString))
+            {
+                conn.Open();
+                var cmd = new SqlCommand("INSERT INTO Materials (Name, Quantity, UnitPrice) VALUES (@name, @qty, @price)", conn);
+                cmd.Parameters.AddWithValue("@name", material.Name);
+                cmd.Parameters.AddWithValue("@qty", material.Quantity);
+                cmd.Parameters.AddWithValue("@price", material.UnitPrice);
+                return cmd.ExecuteNonQuery() == 1;
+            }
+        }
+
+        public static bool UpdateMaterial(MaterialModel material)
+        {
+            using (var conn = new SqlConnection(connectionString))
+            {
+                conn.Open();
+                var cmd = new SqlCommand("UPDATE Materials SET Name = @name, Quantity = @qty, UnitPrice = @price WHERE MaterialID = @id", conn);
+                cmd.Parameters.AddWithValue("@id", material.MaterialID);
+                cmd.Parameters.AddWithValue("@name", material.Name);
+                cmd.Parameters.AddWithValue("@qty", material.Quantity);
+                cmd.Parameters.AddWithValue("@price", material.UnitPrice);
+                return cmd.ExecuteNonQuery() == 1;
+            }
+        }
+
 
     }
 }

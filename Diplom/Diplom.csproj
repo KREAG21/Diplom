@@ -169,8 +169,14 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="AddMaterialWindow.xaml.cs">
+      <DependentUpon>AddMaterialWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="AddSupplyWindow.xaml.cs">
       <DependentUpon>AddSupplyWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="EditMaterialWindow.xaml.cs">
+      <DependentUpon>EditMaterialWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="EditSupplyWindow.xaml.cs">
       <DependentUpon>EditSupplyWindow.xaml</DependentUpon>
@@ -184,6 +190,7 @@
     <Compile Include="Helpers\AuthViewModel.cs" />
     <Compile Include="Helpers\EquipmentEditViewModel.cs" />
     <Compile Include="Helpers\EquipmentViewModel.cs" />
+    <Compile Include="Helpers\MaterialModel.cs" />
     <Compile Include="Helpers\RelayCommand.cs" />
     <Compile Include="Helpers\SupplyModel.cs" />
     <Compile Include="Helpers\ViewModelBase.cs" />
@@ -194,7 +201,15 @@
     <Compile Include="RegisterWindow.xaml.cs">
       <DependentUpon>RegisterWindow.xaml</DependentUpon>
     </Compile>
+    <Page Include="AddMaterialWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="AddSupplyWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="EditMaterialWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

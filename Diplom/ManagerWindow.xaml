@@ -78,7 +78,7 @@
 
                     <StackPanel Orientation="Horizontal" Grid.Row="0" HorizontalAlignment="Left" Margin="0,0,0,10">
                         <Button Content="Добавить" Click="AddSupply_Click" Width="120" />
-                        <Button Content="Редактировать" Click="EditSupply_Click" Width="120" />
+                        <Button Content="Редактировать" Click="EditSupply_Click" Width="130" />
                         <Button Content="Удалить" Click="DeleteSupply_Click" Width="120"/>
                     </StackPanel>
                     
@@ -88,21 +88,51 @@
                             <DataGridTextColumn Header="Поставщик" Binding="{Binding SupplierName}" Width="*"/>
                             <DataGridTextColumn Header="Дата" Binding="{Binding DeliveryDate, StringFormat=d}" Width="120"/>
                             <DataGridTextColumn Header="Стоимость" Binding="{Binding TotalCost, StringFormat=N2}" Width="100"/>
-                            <DataGridTextColumn Header="Материал ID" Binding="{Binding MaterialID}" Width="100"/>
+                            
                         </DataGrid.Columns>
                     </DataGrid>
                 </Grid>
             </TabItem>
             <TabItem Header="Материалы">
                 <Grid Margin="10">
-                    <DataGrid x:Name="MaterialsDataGrid" AutoGenerateColumns="True"/>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <StackPanel Orientation="Horizontal" Grid.Row="0" HorizontalAlignment="Left" Margin="0,0,0,10">
+                        <Button Content="Добавить" Click="AddMaterial_Click" Width="120" />
+                        <Button Content="Редактировать" Click="EditMaterial_Click" Width="130" />
+                        <Button Content="Удалить" Click="DeleteMaterial_Click" Width="120"/>
+                    </StackPanel>
+
+                    <DataGrid x:Name="MaterialsDataGrid" AutoGenerateColumns="False" IsReadOnly="True" Grid.Row="1">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="ID" Binding="{Binding MaterialID}" Width="60"/>
+                            <DataGridTextColumn Header="Название" Binding="{Binding Name}" Width="*"/>
+                            <DataGridTextColumn Header="Количество" Binding="{Binding Quantity}" Width="100"/>
+                            <DataGridTextColumn Header="Цена за ед." Binding="{Binding UnitPrice, StringFormat=N2}" Width="120"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
                 </Grid>
             </TabItem>
+
             <TabItem Header="Заказы">
                 <Grid Margin="10">
-                    <DataGrid x:Name="OrdersDataGrid" AutoGenerateColumns="True"/>
+                    <DataGrid x:Name="OrdersDataGrid"
+                  AutoGenerateColumns="False"
+                  IsReadOnly="True">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="ID" Binding="{Binding OrderID}" Width="50"/>
+                            <DataGridTextColumn Header="Клиент" Binding="{Binding CustomerName}" Width="*"/>
+                            <DataGridTextColumn Header="Услуга" Binding="{Binding ServiceName}" Width="*"/>
+                            <DataGridTextColumn Header="Дата" Binding="{Binding OrderDate, StringFormat=d}" Width="120"/>
+                            <DataGridTextColumn Header="Сумма" Binding="{Binding TotalCost, StringFormat=N2}" Width="100"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
                 </Grid>
             </TabItem>
+
         </TabControl>
     </DockPanel>
 </Window>
