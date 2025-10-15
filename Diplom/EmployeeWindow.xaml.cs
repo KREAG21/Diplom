@@ -25,13 +25,7 @@ namespace Diplom
             Title = $"Панель сотрудника (ID: {userId})";
             LoadOrders();
         }
-
-        public EmployeeWindow()
-        {
-        }
-
-       
-
+        
         private void LoadOrders()
         {
             try
