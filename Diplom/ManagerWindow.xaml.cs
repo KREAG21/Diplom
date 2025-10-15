@@ -33,6 +33,7 @@ namespace Diplom
             LoadSupplies();
         }
 
+        //Подгрузка даннх об оборудовании из БД
         private void LoadSupplies()
         {
             try
@@ -47,7 +48,8 @@ namespace Diplom
                 MessageBox.Show("Ошибка при загрузке поставок:\n" + ex.Message);
             }
         }
-
+        
+        //Подгрузка данных о материалах из БД
         private void LoadMaterials()
         {
             MaterialsDataGrid.ItemsSource = DatabaseHelper.GetMaterials();
