@@ -15,7 +15,6 @@ namespace Diplom
         private int _userId;
         
         
-        private const string ConnectionString = "Server=(local);Database=BeautySalon;Integrated Security=True;";
 
         public EmployeeWindow(int userId)
         {
@@ -30,7 +29,7 @@ namespace Diplom
         {
             try
             {
-                using (var connection = new SqlConnection(ConnectionString))
+                using (var connection = new SqlConnection(DatabaseHelper.ConnectionString))
                 {
                     var adapter = new SqlDataAdapter(
                         "SELECT OrderID, CustomerName, ServiceDescription, OrderDate, TotalAmount, EquipmentID FROM Orders",
@@ -89,7 +88,7 @@ namespace Diplom
             {
                 try
                 {
-                    using (var connection = new SqlConnection(ConnectionString))
+                    using (var connection = new SqlConnection(DatabaseHelper.ConnectionString))
                     {
                         connection.Open();
                         new SqlCommand(

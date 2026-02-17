@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Data;
 using System.Data.SqlClient;
 using System.Windows;
 using System.Windows.Input;
@@ -76,7 +77,7 @@ namespace Diplom
         {
             try
             {
-                using (var connection = new SqlConnection("Server=(local);Database=BeautySalon;Integrated Security=True;"))
+                using (var connection = new SqlConnection(DatabaseHelper.ConnectionString))
                 {
                     connection.Open();
                     var cmd = _orderId == 0
@@ -87,15 +88,17 @@ namespace Diplom
                             "UPDATE Orders SET CustomerName = @Name, ServiceDescription = @Desc, " +
                             "TotalAmount = @Amount, OrderDate = @Date WHERE OrderID = @OrderID", connection);
 
-                    cmd.Parameters.AddWithValue("@Name", CustomerName);
-                    cmd.Parameters.AddWithValue("@Desc", ServiceDescription);
-                    cmd.Parameters.AddWithValue("@Amount", TotalAmount);
-                    cmd.Parameters.AddWithValue("@Date", OrderDate.Value.Date);
+                    cmd.Parameters.Add("@Name", SqlDbType.NVarChar, 150).Value = CustomerName;
+                    cmd.Parameters.Add("@Desc", SqlDbType.NVarChar, 500).Value = ServiceDescription;
+                    cmd.Parameters.Add("@Amount", SqlDbType.Decimal).Value = TotalAmount;
+                    cmd.Parameters["@Amount"].Precision = 18;
+                    cmd.Parameters["@Amount"].Scale = 2;
+                    cmd.Parameters.Add("@Date", SqlDbType.Date).Value = OrderDate.Value.Date;
 
                     if (_orderId == 0)
-                        cmd.Parameters.AddWithValue("@UserID", _userId);
+                        cmd.Parameters.Add("@UserID", SqlDbType.Int).Value = _userId;
                     else
-                        cmd.Parameters.AddWithValue("@OrderID", _orderId);
+                        cmd.Parameters.Add("@OrderID", SqlDbType.Int).Value = _orderId;
 
                     cmd.ExecuteNonQuery();
                 }

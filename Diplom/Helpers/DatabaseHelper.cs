@@ -3,6 +3,7 @@ using Diplom.Model;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Data;
 using System.Data.SqlClient;
 using System.Security.Cryptography;
 using System.Text;
@@ -11,9 +12,14 @@ namespace Diplom
 {
     public static class DatabaseHelper
     {
-        private static readonly string connectionString = ConfigurationManager.ConnectionStrings["BeautySalon"].ConnectionString;
+        private const string PasswordHashPrefix = "PBKDF2";
+        private const int SaltSizeBytes = 16;
+        private const int HashSizeBytes = 32;
+        private const int Pbkdf2Iterations = 100000;
 
-        public static string HashPassword(string password)
+        public static string ConnectionString => ConfigurationManager.ConnectionStrings["BeautySalon"].ConnectionString;
+
+        private static string HashLegacyPassword(string password)
         {
             using (SHA256 sha256 = SHA256.Create())
             {
@@ -23,8 +29,97 @@ namespace Diplom
                 {
                     builder.Append(bytes[i].ToString("x2"));
                 }
+
                 return builder.ToString();
             }
+        }
+
+        private static string HashPassword(string password)
+        {
+            byte[] salt = new byte[SaltSizeBytes];
+            using (var random = RandomNumberGenerator.Create())
+            {
+                random.GetBytes(salt);
+            }
+
+            byte[] hash;
+            using (var pbkdf2 = new Rfc2898DeriveBytes(password, salt, Pbkdf2Iterations, HashAlgorithmName.SHA256))
+            {
+                hash = pbkdf2.GetBytes(HashSizeBytes);
+            }
+
+            return string.Format(
+                "{0}${1}${2}${3}",
+                PasswordHashPrefix,
+                Pbkdf2Iterations,
+                Convert.ToBase64String(salt),
+                Convert.ToBase64String(hash));
+        }
+
+        private static bool FixedTimeEquals(byte[] left, byte[] right)
+        {
+            if (left == null || right == null || left.Length != right.Length)
+            {
+                return false;
+            }
+
+            int diff = 0;
+            for (int i = 0; i < left.Length; i++)
+            {
+                diff |= left[i] ^ right[i];
+            }
+
+            return diff == 0;
+        }
+
+        private static bool VerifyPassword(string password, string storedHash, out bool requiresUpgrade)
+        {
+            requiresUpgrade = false;
+
+            if (string.IsNullOrWhiteSpace(storedHash))
+            {
+                return false;
+            }
+
+            var hashParts = storedHash.Split('$');
+            if (hashParts.Length == 4 && hashParts[0] == PasswordHashPrefix)
+            {
+                int iterations;
+                if (!int.TryParse(hashParts[1], out iterations))
+                {
+                    return false;
+                }
+
+                byte[] salt;
+                byte[] expectedHash;
+                try
+                {
+                    salt = Convert.FromBase64String(hashParts[2]);
+                    expectedHash = Convert.FromBase64String(hashParts[3]);
+                }
+                catch (FormatException)
+                {
+                    return false;
+                }
+
+                byte[] actualHash;
+                using (var pbkdf2 = new Rfc2898DeriveBytes(password, salt, iterations, HashAlgorithmName.SHA256))
+                {
+                    actualHash = pbkdf2.GetBytes(expectedHash.Length);
+                }
+
+                if (!FixedTimeEquals(actualHash, expectedHash))
+                {
+                    return false;
+                }
+
+                requiresUpgrade = iterations < Pbkdf2Iterations;
+                return true;
+            }
+
+            bool legacyMatch = HashLegacyPassword(password) == storedHash;
+            requiresUpgrade = legacyMatch;
+            return legacyMatch;
         }
 
         public static bool RegisterUser(string username, string email, string password, string role, out string error)
@@ -32,7 +127,7 @@ namespace Diplom
             error = null;
             string hashedPassword = HashPassword(password);
 
-            using (SqlConnection connection = new SqlConnection(connectionString))
+            using (SqlConnection connection = new SqlConnection(ConnectionString))
             {
                 try
                 {
@@ -41,14 +136,12 @@ namespace Diplom
 
                     using (SqlCommand command = new SqlCommand(query, connection))
                     {
-                        command.Parameters.AddWithValue("@Username", username);
-                        command.Parameters.AddWithValue("@PasswordHash", hashedPassword);
-                        command.Parameters.AddWithValue("@Email", email);
-                        command.Parameters.AddWithValue("@Role", role);
-                        
+                        command.Parameters.Add("@Username", SqlDbType.NVarChar, 100).Value = username;
+                        command.Parameters.Add("@PasswordHash", SqlDbType.NVarChar, 512).Value = hashedPassword;
+                        command.Parameters.Add("@Email", SqlDbType.NVarChar, 255).Value = email;
+                        command.Parameters.Add("@Role", SqlDbType.NVarChar, 50).Value = role;
 
-                        int result = command.ExecuteNonQuery();
-                        return result == 1;
+                        return command.ExecuteNonQuery() == 1;
                     }
                 }
                 catch (SqlException ex)
@@ -61,27 +154,41 @@ namespace Diplom
 
         public static (bool Success, int UserID, string Role) AuthenticateUser(string username, string password)
         {
-            string hashedPassword = HashPassword(password);
-
-            using (SqlConnection connection = new SqlConnection(connectionString))
+            using (SqlConnection connection = new SqlConnection(ConnectionString))
             {
                 try
                 {
                     connection.Open();
-                    string query = "SELECT UserID, Role FROM Users WHERE Username = @Username AND PasswordHash = @PasswordHash";
+                    const string query = "SELECT UserID, Role, PasswordHash FROM Users WHERE Username = @Username";
 
                     using (SqlCommand command = new SqlCommand(query, connection))
                     {
-                        command.Parameters.AddWithValue("@Username", username);
-                        command.Parameters.AddWithValue("@PasswordHash", hashedPassword);
+                        command.Parameters.Add("@Username", SqlDbType.NVarChar, 100).Value = username;
 
                         using (SqlDataReader reader = command.ExecuteReader())
                         {
-                            if (reader.Read())
+                            if (!reader.Read())
                             {
-                                return (true, reader.GetInt32(0), reader.GetString(1));
+                                return (false, 0, null);
                             }
-                            return (false, 0, null);
+
+                            int userId = reader.GetInt32(0);
+                            string role = reader.GetString(1);
+                            string storedHash = reader[2].ToString();
+
+                            bool requiresUpgrade;
+                            if (!VerifyPassword(password, storedHash, out requiresUpgrade))
+                            {
+                                return (false, 0, null);
+                            }
+
+                            if (requiresUpgrade)
+                            {
+                                reader.Close();
+                                UpgradePasswordHash(connection, userId, password);
+                            }
+
+                            return (true, userId, role);
                         }
                     }
                 }
@@ -92,15 +199,26 @@ namespace Diplom
             }
         }
 
-        internal static bool RegisterUsers(string text1, string text2, string password, string text3, out string error)
+        private static void UpgradePasswordHash(SqlConnection connection, int userId, string password)
         {
-            throw new NotImplementedException();
+            const string updateQuery = "UPDATE Users SET PasswordHash = @PasswordHash WHERE UserID = @UserID";
+            using (SqlCommand updateCommand = new SqlCommand(updateQuery, connection))
+            {
+                updateCommand.Parameters.Add("@PasswordHash", SqlDbType.NVarChar, 512).Value = HashPassword(password);
+                updateCommand.Parameters.Add("@UserID", SqlDbType.Int).Value = userId;
+                updateCommand.ExecuteNonQuery();
+            }
+        }
+
+        internal static bool RegisterUsers(string username, string email, string password, string role, out string error)
+        {
+            return RegisterUser(username, email, password, role, out error);
         }
 
         public static List<EquipmentModel> GetEquipmentList()
         {
             var result = new List<EquipmentModel>();
-            using (var conn = new SqlConnection(connectionString))
+            using (var conn = new SqlConnection(ConnectionString))
             {
                 conn.Open();
                 var cmd = new SqlCommand("SELECT * FROM Equipment", conn);
@@ -124,7 +242,7 @@ namespace Diplom
 
         public static void DeleteEquipment(int equipmentId)
         {
-            using (var conn = new SqlConnection(connectionString)) // connectionString уже должен быть у тебя
+            using (var conn = new SqlConnection(ConnectionString))
             {
                 conn.Open();
                 var cmd = new SqlCommand("DELETE FROM Equipment WHERE EquipmentID = @id", conn);
@@ -135,7 +253,7 @@ namespace Diplom
 
         public static void InsertEquipment(EquipmentModel eq)
         {
-            using (var conn = new SqlConnection(connectionString))
+            using (var conn = new SqlConnection(ConnectionString))
             {
                 conn.Open();
                 var cmd = new SqlCommand("INSERT INTO Equipment (Name, PurchaseDate, Cost, Condition) VALUES (@name, @date, @cost, @cond)", conn);
@@ -149,7 +267,7 @@ namespace Diplom
 
         public static void UpdateEquipment(EquipmentModel eq)
         {
-            using (var conn = new SqlConnection(connectionString))
+            using (var conn = new SqlConnection(ConnectionString))
             {
                 conn.Open();
                 var cmd = new SqlCommand("UPDATE Equipment SET Name = @name, PurchaseDate = @date, Cost = @cost, Condition = @cond WHERE EquipmentID = @id", conn);
@@ -165,7 +283,7 @@ namespace Diplom
         public static List<SupplyModel> GetSupplies()
         {
             var list = new List<SupplyModel>();
-            using (var conn = new SqlConnection(connectionString))
+            using (var conn = new SqlConnection(ConnectionString))
             {
                 conn.Open();
                 var cmd = new SqlCommand("SELECT SupplyID, SupplierName, DeliveryDate, TotalCost, MaterialID FROM Supplies", conn);
@@ -190,7 +308,7 @@ namespace Diplom
 
         public static bool InsertSupply(string supplierName, DateTime deliveryDate, decimal totalCost, int materialId)
         {
-            using (var conn = new SqlConnection(connectionString))
+            using (var conn = new SqlConnection(ConnectionString))
             {
                 conn.Open();
                 var cmd = new SqlCommand("INSERT INTO Supplies (SupplierName, DeliveryDate, TotalCost, MaterialID) VALUES (@name, @date, @cost, @material)", conn);
@@ -205,7 +323,7 @@ namespace Diplom
 
         public static bool UpdateSupply(SupplyModel supply)
         {
-            using (var conn = new SqlConnection(connectionString))
+            using (var conn = new SqlConnection(ConnectionString))
             {
                 conn.Open();
                 var cmd = new SqlCommand(@"UPDATE Supplies 
@@ -223,7 +341,7 @@ namespace Diplom
 
         public static bool DeleteSupply(int supplyId)
         {
-            using (var conn = new SqlConnection(connectionString))
+            using (var conn = new SqlConnection(ConnectionString))
             {
                 conn.Open();
                 var cmd = new SqlCommand("DELETE FROM Supplies WHERE SupplyID = @id", conn);
@@ -235,7 +353,7 @@ namespace Diplom
         public static List<MaterialModel> GetMaterials()
         {
             var list = new List<MaterialModel>();
-            using (var conn = new SqlConnection(connectionString))
+            using (var conn = new SqlConnection(ConnectionString))
             {
                 conn.Open();
                 var cmd = new SqlCommand("SELECT MaterialID, Name, Quantity, UnitPrice FROM Materials", conn);
@@ -258,7 +376,7 @@ namespace Diplom
 
         public static bool DeleteMaterial(int materialId)
         {
-            using (var conn = new SqlConnection(connectionString))
+            using (var conn = new SqlConnection(ConnectionString))
             {
                 conn.Open();
                 var cmd = new SqlCommand("DELETE FROM Materials WHERE MaterialID = @id", conn);
@@ -269,7 +387,7 @@ namespace Diplom
 
         public static bool AddMaterial(MaterialModel material)
         {
-            using (var conn = new SqlConnection(connectionString))
+            using (var conn = new SqlConnection(ConnectionString))
             {
                 conn.Open();
                 var cmd = new SqlCommand("INSERT INTO Materials (Name, Quantity, UnitPrice) VALUES (@name, @qty, @price)", conn);
@@ -282,7 +400,7 @@ namespace Diplom
 
         public static bool UpdateMaterial(MaterialModel material)
         {
-            using (var conn = new SqlConnection(connectionString))
+            using (var conn = new SqlConnection(ConnectionString))
             {
                 conn.Open();
                 var cmd = new SqlCommand("UPDATE Materials SET Name = @name, Quantity = @qty, UnitPrice = @price WHERE MaterialID = @id", conn);
@@ -293,7 +411,5 @@ namespace Diplom
                 return cmd.ExecuteNonQuery() == 1;
             }
         }
-
-
     }
 }
