@@ -92,7 +92,7 @@
     </Window.Resources>
     
 
-    <Grid>
+    <Grid FocusManager.FocusedElement="{Binding ElementName=UsernameBox}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <!-- Заголовок -->
@@ -123,7 +123,7 @@
                 <CheckBox x:Name="RememberCheck" Content="Запомнить меня"/>
 
                 <Button Content="ВОЙТИ" Click="LoginButton_Click" 
-                    Height="40" FontSize="15"/>
+                    Height="40" FontSize="15" IsDefault="True"/>
 
                 <TextBlock Text="Нет учётной записи?" HorizontalAlignment="Center" Margin="0,20,0,0">
                 <Hyperlink Command="{Binding ShowRegisterCommand}">
