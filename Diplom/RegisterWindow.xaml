@@ -47,6 +47,16 @@
             <Setter Property="FontFamily" Value="{StaticResource ImperialFont}"/>
         </Style>
 
+
+        <Style TargetType="ComboBox">
+            <Setter Property="Background" Value="{StaticResource Ivory}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource ImperialGold}"/>
+            <Setter Property="BorderThickness" Value="1.5"/>
+            <Setter Property="Padding" Value="10,8"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Foreground" Value="{StaticResource DarkWood}"/>
+            <Setter Property="FontFamily" Value="{StaticResource ImperialFont}"/>
+        </Style>
         <Style TargetType="Button">
             <Setter Property="Background" Value="{StaticResource ImperialRed}"/>
             <Setter Property="Foreground" Value="{StaticResource ImperialGold}"/>
@@ -100,7 +110,10 @@
                 <TextBox x:Name="EmailBox" Margin="0,5,0,15"/>
 
                 <Label Content="Должность:"/>
-                <TextBox x:Name="RoleBox" Margin="0,5,0,15"/>
+                <ComboBox x:Name="RoleBox" Margin="0,5,0,15" SelectedIndex="0">
+                    <ComboBoxItem Content="сотрудник"/>
+                    <ComboBoxItem Content="менеджер"/>
+                </ComboBox>
 
                 <Label Content="Пароль:"/>
                 <PasswordBox x:Name="RegPasswordBox" Margin="0,5,0,15"/>

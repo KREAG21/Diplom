@@ -5,15 +5,13 @@ using Microsoft.Office.Interop.Excel;
 using PdfSharpCore.Pdf;
 using PdfSharpCore.Drawing;
 using Window = System.Windows.Window;
-using DataTable = System.Data.DataTable;
 
 namespace Diplom
 {
     public partial class EmployeeWindow : Window
     {
         private int _userId;
-        
-        
+        private DataView _ordersView;
 
         public EmployeeWindow(int userId)
         {
@@ -29,12 +27,45 @@ namespace Diplom
             try
             {
                 var table = DatabaseHelper.GetOrdersTable();
-                OrdersGrid.ItemsSource = table.DefaultView;
+                _ordersView = table.DefaultView;
+                OrdersGrid.ItemsSource = _ordersView;
+                ApplyOrderFilter();
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"Ошибка загрузки заказов: {ex.Message}");
             }
+        }
+
+
+        private void ApplyOrderFilter()
+        {
+            if (_ordersView == null)
+            {
+                return;
+            }
+
+            string search = OrderSearchBox?.Text?.Trim().Replace("'", "''") ?? string.Empty;
+            if (string.IsNullOrWhiteSpace(search))
+            {
+                _ordersView.RowFilter = string.Empty;
+                return;
+            }
+
+            _ordersView.RowFilter = string.Format(
+                "Convert(CustomerName, 'System.String') LIKE '%{0}%' OR Convert(ServiceDescription, 'System.String') LIKE '%{0}%'",
+                search);
+        }
+
+        private void OrderSearchBox_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
+        {
+            ApplyOrderFilter();
+        }
+
+        private void ClearOrderSearch_Click(object sender, RoutedEventArgs e)
+        {
+            OrderSearchBox.Text = string.Empty;
+            ApplyOrderFilter();
         }
 
         private void AddOrder_Click(object sender, RoutedEventArgs e)

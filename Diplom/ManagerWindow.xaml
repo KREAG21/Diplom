@@ -51,6 +51,21 @@
                 </Trigger>
             </Style.Triggers>
         </Style>
+
+        <Style TargetType="TextBox">
+            <Setter Property="Background" Value="{StaticResource Ivory}"/>
+            <Setter Property="Foreground" Value="{StaticResource DarkWood}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource ImperialGold}"/>
+            <Setter Property="BorderThickness" Value="1.5"/>
+            <Setter Property="Padding" Value="8,5"/>
+            <Setter Property="FontFamily" Value="{StaticResource ImperialFont}"/>
+        </Style>
+
+        <Style TargetType="StatusBar">
+            <Setter Property="Background" Value="{StaticResource ImperialRed}"/>
+            <Setter Property="Foreground" Value="{StaticResource ImperialGold}"/>
+            <Setter Property="FontFamily" Value="{StaticResource ImperialFont}"/>
+        </Style>
     </Window.Resources>
 
     <DockPanel>
@@ -66,7 +81,7 @@
         </Border>
 
         <!-- Контент с вкладками -->
-        <TabControl FontFamily="{StaticResource ImperialFont}" FontSize="14">
+        <TabControl DockPanel.Dock="Top" FontFamily="{StaticResource ImperialFont}" FontSize="14">
             <TabItem Header="Поставки">
                 <Grid Margin="10">
                     <Grid.RowDefinitions>
@@ -80,6 +95,9 @@
                         <Button Content="Добавить" Click="AddSupply_Click" Width="120" />
                         <Button Content="Редактировать" Click="EditSupply_Click" Width="130" />
                         <Button Content="Удалить" Click="DeleteSupply_Click" Width="120"/>
+                        <TextBox x:Name="SupplySearchBox" Width="240" Margin="20,0,0,0" VerticalContentAlignment="Center"
+                                 TextChanged="SupplySearchBox_TextChanged" ToolTip="Поиск поставщика"/>
+                        <Button Content="Сбросить" Width="90" Click="ClearSupplySearch_Click"/>
                     </StackPanel>
                     
                     <DataGrid x:Name="SuppliesDataGrid" Grid.Row="1" AutoGenerateColumns="False" IsReadOnly="True" Margin="0" Height="Auto">
@@ -104,6 +122,9 @@
                         <Button Content="Добавить" Click="AddMaterial_Click" Width="120" />
                         <Button Content="Редактировать" Click="EditMaterial_Click" Width="130" />
                         <Button Content="Удалить" Click="DeleteMaterial_Click" Width="120"/>
+                        <TextBox x:Name="MaterialSearchBox" Width="240" Margin="20,0,0,0" VerticalContentAlignment="Center"
+                                 TextChanged="MaterialSearchBox_TextChanged" ToolTip="Поиск материала"/>
+                        <Button Content="Сбросить" Width="90" Click="ClearMaterialSearch_Click"/>
                     </StackPanel>
 
                     <DataGrid x:Name="MaterialsDataGrid" AutoGenerateColumns="False" IsReadOnly="True" Grid.Row="1">
@@ -120,5 +141,11 @@
             
 
         </TabControl>
+
+        <StatusBar DockPanel.Dock="Bottom">
+            <StatusBarItem>
+                <TextBlock x:Name="ManagerStatusText" Text="Готово" Foreground="{StaticResource ImperialGold}"/>
+            </StatusBarItem>
+        </StatusBar>
     </DockPanel>
 </Window>
