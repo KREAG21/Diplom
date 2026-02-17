@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Data;
-using System.Data.SqlClient;
 using System.Windows;
 using System.Windows.Input;
 
@@ -77,30 +75,18 @@ namespace Diplom
         {
             try
             {
-                using (var connection = new SqlConnection(DatabaseHelper.ConnectionString))
+                bool success = DatabaseHelper.SaveOrder(
+                    _orderId,
+                    CustomerName,
+                    ServiceDescription,
+                    TotalAmount,
+                    OrderDate.Value.Date,
+                    _userId);
+
+                if (!success)
                 {
-                    connection.Open();
-                    var cmd = _orderId == 0
-                        ? new SqlCommand(
-                            "INSERT INTO Orders (CustomerName, ServiceDescription, TotalAmount, OrderDate, UserID) " +
-                            "VALUES (@Name, @Desc, @Amount, @Date, @UserID)", connection)
-                        : new SqlCommand(
-                            "UPDATE Orders SET CustomerName = @Name, ServiceDescription = @Desc, " +
-                            "TotalAmount = @Amount, OrderDate = @Date WHERE OrderID = @OrderID", connection);
-
-                    cmd.Parameters.Add("@Name", SqlDbType.NVarChar, 150).Value = CustomerName;
-                    cmd.Parameters.Add("@Desc", SqlDbType.NVarChar, 500).Value = ServiceDescription;
-                    cmd.Parameters.Add("@Amount", SqlDbType.Decimal).Value = TotalAmount;
-                    cmd.Parameters["@Amount"].Precision = 18;
-                    cmd.Parameters["@Amount"].Scale = 2;
-                    cmd.Parameters.Add("@Date", SqlDbType.Date).Value = OrderDate.Value.Date;
-
-                    if (_orderId == 0)
-                        cmd.Parameters.Add("@UserID", SqlDbType.Int).Value = _userId;
-                    else
-                        cmd.Parameters.Add("@OrderID", SqlDbType.Int).Value = _orderId;
-
-                    cmd.ExecuteNonQuery();
+                    MessageBox.Show("Не удалось сохранить заказ", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
                 }
 
                 MessageBox.Show("Заказ сохранен");

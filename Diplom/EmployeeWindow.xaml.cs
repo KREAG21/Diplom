@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Data;
-using System.Data.SqlClient;
 using System.Windows;
 using Microsoft.Office.Interop.Excel;
 using PdfSharpCore.Pdf;
@@ -29,15 +28,8 @@ namespace Diplom
         {
             try
             {
-                using (var connection = new SqlConnection(DatabaseHelper.ConnectionString))
-                {
-                    var adapter = new SqlDataAdapter(
-                        "SELECT OrderID, CustomerName, ServiceDescription, OrderDate, TotalAmount, EquipmentID FROM Orders",
-                        connection);
-                    var table = new DataTable();
-                    adapter.Fill(table);
-                    OrdersGrid.ItemsSource = table.DefaultView;
-                }
+                var table = DatabaseHelper.GetOrdersTable();
+                OrdersGrid.ItemsSource = table.DefaultView;
             }
             catch (Exception ex)
             {
@@ -88,18 +80,16 @@ namespace Diplom
             {
                 try
                 {
-                    using (var connection = new SqlConnection(DatabaseHelper.ConnectionString))
+                    int orderId = Convert.ToInt32(row["OrderID"]);
+                    if (DatabaseHelper.DeleteOrder(orderId))
                     {
-                        connection.Open();
-                        new SqlCommand(
-                            "DELETE FROM Orders WHERE OrderID = @OrderID",
-                            connection)
-                        {
-                            Parameters = { new SqlParameter("@OrderID", row["OrderID"]) }
-                        }.ExecuteNonQuery();
+                        LoadOrders();
+                        StatusText.Text = "Заказ успешно удален";
                     }
-                    LoadOrders();
-                    StatusText.Text = "Заказ успешно удален";
+                    else
+                    {
+                        MessageBox.Show("Не удалось удалить заказ.");
+                    }
                 }
                 catch (Exception ex)
                 {
