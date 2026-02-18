@@ -8,68 +8,9 @@
         Title="Цирюльникъ | Таблица записей" 
         WindowState="Maximized"
         WindowStartupLocation="CenterScreen"
-        Background="#FFFAF5EE" d:DesignHeight="657.231" d:DesignWidth="1401.897">
+        Background="{StaticResource Ivory}" d:DesignHeight="657.231" d:DesignWidth="1401.897">
 
-    <Window.Resources>
-        <FontFamily x:Key="ImperialFont">Palatino Linotype</FontFamily>
-        <SolidColorBrush x:Key="ImperialGold" Color="#FFD4AF37"/>
-        <SolidColorBrush x:Key="ImperialRed" Color="#FF8B0000"/>
-        <SolidColorBrush x:Key="Ivory" Color="#FFFAF5EE"/>
-        <SolidColorBrush x:Key="DarkWood" Color="#FF5D2906"/>
-
-        <Style TargetType="Button">
-            <Setter Property="Background" Value="{StaticResource ImperialRed}"/>
-            <Setter Property="Foreground" Value="{StaticResource ImperialGold}"/>
-            <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="Padding" Value="12,6"/>
-            <Setter Property="FontWeight" Value="Bold"/>
-            <Setter Property="FontSize" Value="14"/>
-            <Setter Property="FontFamily" Value="{StaticResource ImperialFont}"/>
-            <Setter Property="Cursor" Value="Hand"/>
-            <Setter Property="Margin" Value="5,0,0,0"/>
-            <Style.Triggers>
-                <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="#FFA52A2A"/>
-                    <Setter Property="Foreground" Value="#FFE6C060"/>
-                </Trigger>
-                <Trigger Property="IsPressed" Value="True">
-                    <Setter Property="Background" Value="#FF800000"/>
-                </Trigger>
-            </Style.Triggers>
-        </Style>
-
-        <Style TargetType="TextBlock">
-            <Setter Property="Foreground" Value="{StaticResource DarkWood}"/>
-            <Setter Property="FontFamily" Value="{StaticResource ImperialFont}"/>
-        </Style>
-
-        <Style TargetType="DataGrid">
-            <Setter Property="Background" Value="{StaticResource Ivory}"/>
-            <Setter Property="Foreground" Value="{StaticResource DarkWood}"/>
-            <Setter Property="BorderBrush" Value="{StaticResource ImperialGold}"/>
-            <Setter Property="BorderThickness" Value="2"/>
-            <Setter Property="FontFamily" Value="{StaticResource ImperialFont}"/>
-            <Setter Property="RowBackground" Value="{StaticResource Ivory}"/>
-            <Setter Property="AlternatingRowBackground" Value="#FFF0E6D6"/>
-            <Setter Property="HeadersVisibility" Value="Column"/>
-            <Setter Property="GridLinesVisibility" Value="None"/>
-        </Style>
-
-        <Style TargetType="DataGridColumnHeader">
-            <Setter Property="Background" Value="{StaticResource ImperialRed}"/>
-            <Setter Property="Foreground" Value="{StaticResource ImperialGold}"/>
-            <Setter Property="FontWeight" Value="Bold"/>
-            <Setter Property="Padding" Value="10,5"/>
-            <Setter Property="BorderBrush" Value="{StaticResource ImperialGold}"/>
-            <Setter Property="BorderThickness" Value="0,0,0,2"/>
-        </Style>
-
-        <Style TargetType="StatusBar">
-            <Setter Property="Background" Value="{StaticResource ImperialRed}"/>
-            <Setter Property="Foreground" Value="{StaticResource ImperialGold}"/>
-            <Setter Property="FontFamily" Value="{StaticResource ImperialFont}"/>
-        </Style>
-    </Window.Resources>
+    
 
     <Grid Margin="15">
         <Grid.RowDefinitions>
