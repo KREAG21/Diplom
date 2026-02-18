@@ -1,21 +1,17 @@
 ﻿using System;
 using System.Data;
-using System.Data.SqlClient;
 using System.Windows;
 using Microsoft.Office.Interop.Excel;
 using PdfSharpCore.Pdf;
 using PdfSharpCore.Drawing;
 using Window = System.Windows.Window;
-using DataTable = System.Data.DataTable;
 
 namespace Diplom
 {
     public partial class EmployeeWindow : Window
     {
         private int _userId;
-        
-        
-        private const string ConnectionString = "Server=(local);Database=BeautySalon;Integrated Security=True;";
+        private DataView _ordersView;
 
         public EmployeeWindow(int userId)
         {
@@ -30,20 +26,46 @@ namespace Diplom
         {
             try
             {
-                using (var connection = new SqlConnection(ConnectionString))
-                {
-                    var adapter = new SqlDataAdapter(
-                        "SELECT OrderID, CustomerName, ServiceDescription, OrderDate, TotalAmount, EquipmentID FROM Orders",
-                        connection);
-                    var table = new DataTable();
-                    adapter.Fill(table);
-                    OrdersGrid.ItemsSource = table.DefaultView;
-                }
+                var table = DatabaseHelper.GetOrdersTable();
+                _ordersView = table.DefaultView;
+                OrdersGrid.ItemsSource = _ordersView;
+                ApplyOrderFilter();
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"Ошибка загрузки заказов: {ex.Message}");
             }
+        }
+
+
+        private void ApplyOrderFilter()
+        {
+            if (_ordersView == null)
+            {
+                return;
+            }
+
+            string search = OrderSearchBox?.Text?.Trim().Replace("'", "''") ?? string.Empty;
+            if (string.IsNullOrWhiteSpace(search))
+            {
+                _ordersView.RowFilter = string.Empty;
+                return;
+            }
+
+            _ordersView.RowFilter = string.Format(
+                "Convert(CustomerName, 'System.String') LIKE '%{0}%' OR Convert(ServiceDescription, 'System.String') LIKE '%{0}%'",
+                search);
+        }
+
+        private void OrderSearchBox_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
+        {
+            ApplyOrderFilter();
+        }
+
+        private void ClearOrderSearch_Click(object sender, RoutedEventArgs e)
+        {
+            OrderSearchBox.Text = string.Empty;
+            ApplyOrderFilter();
         }
 
         private void AddOrder_Click(object sender, RoutedEventArgs e)
@@ -89,18 +111,16 @@ namespace Diplom
             {
                 try
                 {
-                    using (var connection = new SqlConnection(ConnectionString))
+                    int orderId = Convert.ToInt32(row["OrderID"]);
+                    if (DatabaseHelper.DeleteOrder(orderId))
                     {
-                        connection.Open();
-                        new SqlCommand(
-                            "DELETE FROM Orders WHERE OrderID = @OrderID",
-                            connection)
-                        {
-                            Parameters = { new SqlParameter("@OrderID", row["OrderID"]) }
-                        }.ExecuteNonQuery();
+                        LoadOrders();
+                        StatusText.Text = "Заказ успешно удален";
                     }
-                    LoadOrders();
-                    StatusText.Text = "Заказ успешно удален";
+                    else
+                    {
+                        MessageBox.Show("Не удалось удалить заказ.");
+                    }
                 }
                 catch (Exception ex)
                 {

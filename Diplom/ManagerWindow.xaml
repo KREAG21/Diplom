@@ -4,54 +4,10 @@
         Title="Менеджер | Цирюльникъ"
         Width="1000" Height="700"
         WindowStartupLocation="CenterScreen"
-        Background="#FFFAF5EE"
+        Background="{StaticResource Ivory}"
         ResizeMode="CanResize">
 
-    <Window.Resources>
-        <FontFamily x:Key="ImperialFont">Palatino Linotype</FontFamily>
-
-        <SolidColorBrush x:Key="ImperialGold" Color="#FFD4AF37"/>
-        <SolidColorBrush x:Key="ImperialRed" Color="#FF8B0000"/>
-        <SolidColorBrush x:Key="Ivory" Color="#FFFAF5EE"/>
-        <SolidColorBrush x:Key="DarkWood" Color="#FF5D2906"/>
-
-        <Style TargetType="TabItem">
-            <Setter Property="FontFamily" Value="{StaticResource ImperialFont}" />
-            <Setter Property="FontSize" Value="16"/>
-            <Setter Property="Foreground" Value="{StaticResource ImperialRed}"/>
-            <Setter Property="Background" Value="{StaticResource ImperialGold}"/>
-            <Setter Property="Margin" Value="1"/>
-        </Style>
-
-        <Style TargetType="DataGrid">
-            <Setter Property="Background" Value="{StaticResource Ivory}"/>
-            <Setter Property="Foreground" Value="{StaticResource DarkWood}"/>
-            <Setter Property="FontFamily" Value="{StaticResource ImperialFont}"/>
-            <Setter Property="FontSize" Value="14"/>
-            <Setter Property="RowBackground" Value="White"/>
-            <Setter Property="AlternatingRowBackground" Value="#FFFFF0D0"/>
-            <Setter Property="GridLinesVisibility" Value="Horizontal"/>
-        </Style>
-
-        <Style TargetType="Button">
-            <Setter Property="Background" Value="{StaticResource ImperialRed}"/>
-            <Setter Property="Foreground" Value="{StaticResource ImperialGold}"/>
-            <Setter Property="FontFamily" Value="{StaticResource ImperialFont}"/>
-            <Setter Property="FontSize" Value="14"/>
-            <Setter Property="FontWeight" Value="Bold"/>
-            <Setter Property="Margin" Value="5"/>
-            <Setter Property="Padding" Value="10,5"/>
-            <Setter Property="Cursor" Value="Hand"/>
-            <Style.Triggers>
-                <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="#FFA52A2A"/>
-                </Trigger>
-                <Trigger Property="IsPressed" Value="True">
-                    <Setter Property="Background" Value="#FF800000"/>
-                </Trigger>
-            </Style.Triggers>
-        </Style>
-    </Window.Resources>
+    
 
     <DockPanel>
         <!-- Верхняя панель -->
@@ -66,7 +22,7 @@
         </Border>
 
         <!-- Контент с вкладками -->
-        <TabControl FontFamily="{StaticResource ImperialFont}" FontSize="14">
+        <TabControl DockPanel.Dock="Top" FontFamily="{StaticResource ImperialFont}" FontSize="14">
             <TabItem Header="Поставки">
                 <Grid Margin="10">
                     <Grid.RowDefinitions>
@@ -80,6 +36,9 @@
                         <Button Content="Добавить" Click="AddSupply_Click" Width="120" />
                         <Button Content="Редактировать" Click="EditSupply_Click" Width="130" />
                         <Button Content="Удалить" Click="DeleteSupply_Click" Width="120"/>
+                        <TextBox x:Name="SupplySearchBox" Width="240" Margin="20,0,0,0" VerticalContentAlignment="Center"
+                                 TextChanged="SupplySearchBox_TextChanged" ToolTip="Поиск поставщика"/>
+                        <Button Content="Сбросить" Width="90" Click="ClearSupplySearch_Click"/>
                     </StackPanel>
                     
                     <DataGrid x:Name="SuppliesDataGrid" Grid.Row="1" AutoGenerateColumns="False" IsReadOnly="True" Margin="0" Height="Auto">
@@ -104,6 +63,9 @@
                         <Button Content="Добавить" Click="AddMaterial_Click" Width="120" />
                         <Button Content="Редактировать" Click="EditMaterial_Click" Width="130" />
                         <Button Content="Удалить" Click="DeleteMaterial_Click" Width="120"/>
+                        <TextBox x:Name="MaterialSearchBox" Width="240" Margin="20,0,0,0" VerticalContentAlignment="Center"
+                                 TextChanged="MaterialSearchBox_TextChanged" ToolTip="Поиск материала"/>
+                        <Button Content="Сбросить" Width="90" Click="ClearMaterialSearch_Click"/>
                     </StackPanel>
 
                     <DataGrid x:Name="MaterialsDataGrid" AutoGenerateColumns="False" IsReadOnly="True" Grid.Row="1">
@@ -120,5 +82,11 @@
             
 
         </TabControl>
+
+        <StatusBar DockPanel.Dock="Bottom">
+            <StatusBarItem>
+                <TextBlock x:Name="ManagerStatusText" Text="Готово" Foreground="{StaticResource ImperialGold}"/>
+            </StatusBarItem>
+        </StatusBar>
     </DockPanel>
 </Window>
