@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Data.SqlClient;
 using System.Windows;
 using System.Windows.Input;
 
@@ -76,28 +75,18 @@ namespace Diplom
         {
             try
             {
-                using (var connection = new SqlConnection("Server=(local);Database=BeautySalon;Integrated Security=True;"))
+                bool success = DatabaseHelper.SaveOrder(
+                    _orderId,
+                    CustomerName,
+                    ServiceDescription,
+                    TotalAmount,
+                    OrderDate.Value.Date,
+                    _userId);
+
+                if (!success)
                 {
-                    connection.Open();
-                    var cmd = _orderId == 0
-                        ? new SqlCommand(
-                            "INSERT INTO Orders (CustomerName, ServiceDescription, TotalAmount, OrderDate, UserID) " +
-                            "VALUES (@Name, @Desc, @Amount, @Date, @UserID)", connection)
-                        : new SqlCommand(
-                            "UPDATE Orders SET CustomerName = @Name, ServiceDescription = @Desc, " +
-                            "TotalAmount = @Amount, OrderDate = @Date WHERE OrderID = @OrderID", connection);
-
-                    cmd.Parameters.AddWithValue("@Name", CustomerName);
-                    cmd.Parameters.AddWithValue("@Desc", ServiceDescription);
-                    cmd.Parameters.AddWithValue("@Amount", TotalAmount);
-                    cmd.Parameters.AddWithValue("@Date", OrderDate.Value.Date);
-
-                    if (_orderId == 0)
-                        cmd.Parameters.AddWithValue("@UserID", _userId);
-                    else
-                        cmd.Parameters.AddWithValue("@OrderID", _orderId);
-
-                    cmd.ExecuteNonQuery();
+                    MessageBox.Show("Не удалось сохранить заказ", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
                 }
 
                 MessageBox.Show("Заказ сохранен");
